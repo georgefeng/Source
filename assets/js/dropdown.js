@@ -1,10 +1,11 @@
 function dropdown() {
+    console.log('[dropdown] init');
     const mediaQuery = window.matchMedia('(max-width: 767px)');
 
     const head = document.querySelector('.gh-navigation');
     const menu = head.querySelector('.gh-navigation-menu');
     const nav = menu?.querySelector('.nav');
-    if (!nav) return;
+    if (!nav) { console.log('[dropdown] no .nav found, exit'); return; }
 
     const logo = document.querySelector('.gh-navigation-logo');
     const navHTML = nav.innerHTML;
@@ -14,16 +15,19 @@ function dropdown() {
         items.forEach(function (item, index) {
             item.style.transitionDelay = `${0.03 * (index + 1)}s`;
         });
+        console.log('[dropdown] mobile, items:', items.length);
     }
 
     const makeDropdown = function () {
-        if (mediaQuery.matches) return;
+        if (mediaQuery.matches) { console.log('[dropdown] skip on mobile'); return; }
         const submenuItems = [];
 
+        console.log('[dropdown] widths', {navW: nav.offsetWidth, menuW: menu.offsetWidth});
         while ((nav.offsetWidth + 64) > menu.offsetWidth) {
             if (nav.lastElementChild) {
                 submenuItems.unshift(nav.lastElementChild);
                 nav.lastElementChild.remove();
+                console.log('[dropdown] moved one item into submenu, remaining children:', nav.children.length);
             } else {
                 break;
             }
@@ -31,6 +35,7 @@ function dropdown() {
 
         if (!submenuItems.length) {
             head.classList.add('is-dropdown-loaded');
+            console.log('[dropdown] no submenu items needed');
             return;
         }
 
@@ -64,22 +69,27 @@ function dropdown() {
         }
 
         head.classList.add('is-dropdown-loaded');
+        console.log('[dropdown] built with items:', submenuItems.length);
 
         window.addEventListener('click', function (e) {
             if (head.classList.contains('is-dropdown-open')) {
                 head.classList.remove('is-dropdown-open');
+                console.log('[dropdown] closed');
             } else if (toggle.contains(e.target)) {
                 head.classList.add('is-dropdown-open');
+                console.log('[dropdown] opened');
             }
         });
     }
 
     imagesLoaded(logo, function () {
+        console.log('[dropdown] imagesLoaded logo');
         makeDropdown();
     });
 
     window.addEventListener('load', function () {
         if (!logo) {
+            console.log('[dropdown] load event, no logo, makeDropdown');
             makeDropdown();
         }
     });
@@ -87,6 +97,7 @@ function dropdown() {
     window.addEventListener('resize', function () {
         setTimeout(() => {
             nav.innerHTML = navHTML;
+            console.log('[dropdown] resize, rebuild');
             makeDropdown();
         }, 1);
     });

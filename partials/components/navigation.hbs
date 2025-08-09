@@ -18,6 +18,20 @@
 
         <nav class="gh-navigation-menu">
             {{navigation}}
+            {{!-- Debug logs for navigation context --}}
+            {{log "[nav] rendering navigation.hbs"}}
+            {{log this}}
+
+            {{!-- Hidden all public tags as source; JS filters slug starting with category- --}}
+            {{#get "tags" limit="100" include="count.posts"}}
+                {{log "[nav] fetched all tags (JS will filter prefix category-)" tags}}
+                <ul class="nav gh-category-extra" style="display:none" data-source="categories">
+                    {{#foreach tags}}
+                        {{log "[nav] source tag" slug}}
+                        <li class="nav-category-item nav-{{slug}}" data-slug="{{slug}}"><a href="{{url}}">{{name}}</a></li>
+                    {{/foreach}}
+                </ul>
+            {{/get}}
             {{#unless @site.members_enabled}}
                 {{#match navigationLayout "Stacked"}}
                     {{> "search-toggle"}}

@@ -727,6 +727,27 @@ Search                         LOGO                    Login Subscribe
     padding: 8px 0;
 }
 
+/* Category dropdown specific */
+.nav-category {
+    position: relative;
+}
+
+.nav-category .nav-category-link::after {
+    content: none;
+}
+
+.nav-category .gh-category-dropdown {
+    right: auto;
+    left: -16px;
+    min-width: 220px;
+}
+
+.nav-category.is-open > .gh-category-dropdown {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* 6.4. Mobile menu */
 
 .gh-burger {

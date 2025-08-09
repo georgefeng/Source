@@ -58,3 +58,100 @@
         wrapper.appendChild(table);
     });
 })();
+
+/* Build Category dropdown (tags with slug starting with category-) */
+(function () {
+    try {
+        console.log('[category] init');
+        const head = document.querySelector('.gh-navigation');
+        if (!head) { console.log('[category] no .gh-navigation'); return; }
+        const menu = head.querySelector('.gh-navigation-menu');
+        if (!menu) { console.log('[category] no .gh-navigation-menu'); return; }
+        const nav = menu.querySelector('.nav');
+        if (!nav) { console.log('[category] no .nav'); return; }
+
+        const source = menu.querySelector('ul.gh-category-extra[data-source="categories"]');
+        if (!source) { console.log('[category] no hidden category source UL'); return; }
+        const items = Array.from(source.querySelectorAll('li'))
+            .filter(function (li) {
+                const slug = li.getAttribute('data-slug') || '';
+                const ok = slug.indexOf('category-') === 0;
+                if (!ok) { console.log('[category] filtered out non-category tag:', slug); }
+                return ok;
+            });
+        console.log('[category] found category items:', items.length);
+        if (!items.length) { console.log('[category] no category-* tags, skip'); return; }
+
+        // Create LI container
+        const li = document.createElement('li');
+        li.className = 'nav-category';
+
+        // Create toggle link
+        const toggle = document.createElement('a');
+        toggle.href = '#';
+        toggle.className = 'nav-category-link';
+        toggle.setAttribute('aria-haspopup', 'true');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.textContent = 'Category';
+
+        // Create dropdown wrapper
+        const wrapper = document.createElement('div');
+        wrapper.className = 'gh-dropdown gh-category-dropdown';
+
+        // Append cloned items
+        items.forEach(function (item, idx) {
+            console.log('[category] append item', idx, item?.className);
+            wrapper.appendChild(item.cloneNode(true));
+        });
+
+        li.appendChild(toggle);
+        li.appendChild(wrapper);
+
+        // Insert after first two items (e.g., Home, About)
+        const siblings = Array.from(nav.children).filter(function (el) { return el.tagName && el.tagName.toLowerCase() === 'li'; });
+        const insertIndex = Math.min(2, siblings.length);
+        const refNode = siblings[insertIndex] || null;
+        console.log('[category] insert position index=', insertIndex, 'of', siblings.length);
+        nav.insertBefore(li, refNode);
+
+        const close = function () {
+            if (li.classList.contains('is-open')) {
+                li.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        };
+
+        // Toggle behavior
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const willOpen = !li.classList.contains('is-open');
+            console.log('[category] toggle click, willOpen=', willOpen);
+            // Close any open overflow dropdown controlled by header class
+            head.classList.remove('is-dropdown-open');
+            // Toggle this dropdown
+            if (willOpen) {
+                li.classList.add('is-open');
+                toggle.setAttribute('aria-expanded', 'true');
+            } else {
+                li.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        window.addEventListener('click', function (e) {
+            if (!li.contains(e.target)) {
+                close();
+            }
+        });
+
+        window.addEventListener('resize', function () {
+            // No layout recompute needed, but keep log
+            console.log('[category] window resize');
+        });
+
+        console.log('[category] initialized successfully');
+    } catch (err) {
+        console.error('[category] init error', err);
+    }
+})();
