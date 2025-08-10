@@ -748,6 +748,27 @@ Search                         LOGO                    Login Subscribe
     transform: translateY(0);
 }
 
+/* Topic dropdown specific */
+.nav-topic {
+    position: relative;
+}
+
+.nav-topic .nav-topic-link::after {
+    content: none;
+}
+
+.nav-topic .gh-topic-dropdown {
+    right: auto;
+    left: -16px;
+    min-width: 220px;
+}
+
+.nav-topic.is-open > .gh-topic-dropdown {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* 6.4. Mobile menu */
 
 .gh-burger {

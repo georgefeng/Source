@@ -155,3 +155,89 @@
         console.error('[category] init error', err);
     }
 })();
+
+/* Build Topic dropdown (tags with slug starting with topic-) */
+(function () {
+    try {
+        console.log('[topic] init');
+        const head = document.querySelector('.gh-navigation');
+        if (!head) { console.log('[topic] no .gh-navigation'); return; }
+        const menu = head.querySelector('.gh-navigation-menu');
+        if (!menu) { console.log('[topic] no .gh-navigation-menu'); return; }
+        const nav = menu.querySelector('.nav');
+        if (!nav) { console.log('[topic] no .nav'); return; }
+
+        const source = menu.querySelector('ul.gh-topic-extra[data-source="topics"]');
+        if (!source) { console.log('[topic] no hidden topic source UL'); return; }
+        const items = Array.from(source.querySelectorAll('li'))
+            .filter(function (li) {
+                const slug = li.getAttribute('data-slug') || '';
+                const ok = slug.indexOf('topic-') === 0;
+                if (!ok) { console.log('[topic] filtered out non-topic tag:', slug); }
+                return ok;
+            });
+        console.log('[topic] found topic items:', items.length);
+        if (!items.length) { console.log('[topic] no topic-* tags, skip'); return; }
+
+        const li = document.createElement('li');
+        li.className = 'nav-topic';
+
+        const toggle = document.createElement('a');
+        toggle.href = '#';
+        toggle.className = 'nav-topic-link';
+        toggle.setAttribute('aria-haspopup', 'true');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.textContent = 'Topic';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'gh-dropdown gh-topic-dropdown';
+
+        items.forEach(function (item) {
+            wrapper.appendChild(item.cloneNode(true));
+        });
+
+        li.appendChild(toggle);
+        li.appendChild(wrapper);
+
+        const siblings = Array.from(nav.children).filter(function (el) { return el.tagName && el.tagName.toLowerCase() === 'li'; });
+        const insertIndex = Math.min(3, siblings.length); // after Home, About, Category
+        const refNode = siblings[insertIndex] || null;
+        console.log('[topic] insert position index=', insertIndex, 'of', siblings.length);
+        nav.insertBefore(li, refNode);
+
+        const close = function () {
+            if (li.classList.contains('is-open')) {
+                li.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        };
+
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const willOpen = !li.classList.contains('is-open');
+            head.classList.remove('is-dropdown-open');
+            if (willOpen) {
+                li.classList.add('is-open');
+                toggle.setAttribute('aria-expanded', 'true');
+            } else {
+                li.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        window.addEventListener('click', function (e) {
+            if (!li.contains(e.target)) {
+                close();
+            }
+        });
+
+        window.addEventListener('resize', function () {
+            console.log('[topic] window resize');
+        });
+
+        console.log('[topic] initialized successfully');
+    } catch (err) {
+        console.error('[topic] init error', err);
+    }
+})();
