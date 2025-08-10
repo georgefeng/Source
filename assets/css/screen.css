@@ -2106,6 +2106,16 @@ Search                         LOGO                    Login Subscribe
 
 .gh-article-image img {
     width: 100%;
+    /* Limit hero image height to keep text within first viewport */
+    max-height: clamp(280px, 60vh, 720px);
+    object-fit: cover;
+}
+
+@media (max-width: 767px) {
+    .gh-article-image img {
+        /* Slightly smaller on phones */
+        max-height: clamp(200px, 45vh, 560px);
+    }
 }
 
 /* 14.2. Page template */
